@@ -3,7 +3,7 @@
 using namespace std;
 
 int main() {
-    PDA pda("input-pda2cfg1.json");
+    PDA pda("input-pda2cfg2.json");
     pda.toCFG().print();
     return 0;
 }

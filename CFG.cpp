@@ -1,5 +1,8 @@
 #include <iostream>
+#include <string>
+#include <vector>
 #include <fstream>
+#include <iomanip>
 #include "json.hpp"
 #include "CFG.h"
 
@@ -28,12 +31,17 @@ void CFG::print() {
 
     // Print P
     std::cout << "P = {" << std::endl;
-    for (const auto&production: productions) {
-        std::cout << "    " << production.first << " -> ";
+    for (const auto &production: productions) {
+        if (production.first == "S") {
+            std::cout << "    " << production.first << "   -> ";
+        } else {
+            std::cout << "    " << std::setw(12) << std::left << production.first << "-> ";
+        }
+
+
         if (production.second.empty()) {
             std::cout << "``";
-        }
-        else {
+        } else {
             std::cout << "`";
             for (size_t i = 0; i < production.second.size(); ++i) {
                 std::cout << production.second[i];
@@ -47,35 +55,36 @@ void CFG::print() {
     }
     std::cout << "}" << std::endl;
 
+
     // Print start
     std::cout << "S = " << start;
 }
 
 
-CFG::CFG(const string&filename) {
+CFG::CFG(const string &filename) {
     ifstream input_stream(filename);
     json json_input = json::parse(input_stream);
 
     // Get Variables
-    for (const auto&symbol: json_input["Variables"]) {
+    for (const auto &symbol: json_input["Variables"]) {
         variables.push_back(symbol);
     }
 
     // Get Terminals
-    for (const auto&symbol: json_input["Terminals"]) {
+    for (const auto &symbol: json_input["Terminals"]) {
         terminals.push_back(symbol);
     }
 
     // Get Productions
-    for (const auto&production: json_input["Productions"]) {
+    for (const auto &production: json_input["Productions"]) {
         std::string head = production["head"];
         std::vector<std::string> body;
 
-        for (const auto&symbol: production["body"]) {
+        for (const auto &symbol: production["body"]) {
             body.push_back(symbol);
         }
 
-        productions.push_back(std::make_pair(head, body));
+        productions.emplace_back(head, body);
     }
 
     // Get start state
@@ -87,10 +96,10 @@ CFG::CFG(const string&filename) {
     std::sort(productions.begin(), productions.end());
 }
 
-CFG::CFG(const std::vector<std::string>&variables, const std::vector<std::string>&terminals,
-         const std::vector<std::pair<std::string, std::vector<std::string>>>&productions, const std::string&start)
-    : variables(variables),
-      terminals(terminals),
-      productions(productions),
-      start(start) {
+CFG::CFG(const std::vector<std::string> &variables, const std::vector<std::string> &terminals,
+         const std::vector<std::pair<std::string, std::vector<std::string>>> &productions, const std::string &start)
+        : variables(variables),
+          terminals(terminals),
+          productions(productions),
+          start(start) {
 }
